@@ -42,6 +42,8 @@ namespace MCFGSextractor
                         //reader.ReadByte();
                         //Console.WriteLine(file.Position);
                         var strLen = reader.ReadUInt16();
+                        if (strLen < 1)
+                            continue;
                         var filename = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(strLen - 1));
                         Console.WriteLine(filename);
                         //Console.WriteLine(file.Position);
@@ -49,6 +51,8 @@ namespace MCFGSextractor
                         reader.ReadByte();
                         reader.ReadByte();
                         var length = reader.ReadUInt16();
+                        if (length < 1)
+                            continue;
                         reader.ReadByte();
                         var contents = reader.ReadBytes(length - 1);
                         //var contents = reader.ReadString();
