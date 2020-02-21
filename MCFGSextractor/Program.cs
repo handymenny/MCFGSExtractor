@@ -19,7 +19,9 @@ namespace MCFGSextractor
 
             using (var reader = new BinaryReader(file))
             {
-                var pattern = new byte[] { 0x00, 0x00, 0x02, 0x19, 0x00, 0x00 };
+                var pattern = new byte[] { 0x00, 0x00, 0x02, 0x19, 0x00, 0x00, 0x01 };
+                var pattern2 = new byte[] { 0x00, 0x00, 0x02, 0x09, 0x00, 0x00, 0x01 };
+
                 Queue<byte> queue = new Queue<byte>(pattern.Length);
 
                 byte[] buffer = new byte[1];
@@ -31,12 +33,12 @@ namespace MCFGSextractor
                     }
 
                     queue.Enqueue(buffer[0]);
-                    if (Matches(queue, pattern))
+                    if (Matches(queue, pattern) || Matches(queue, pattern2))
                     {
                         // The input is positioned after the last read byte, which
                         // completed the pattern.
                         //Console.WriteLine("Found pattern at " + file.Position);
-                        reader.ReadByte();
+                        //reader.ReadByte();
                         reader.ReadByte();
                         //var length = reader.ReadByte();
                         //reader.ReadByte();
