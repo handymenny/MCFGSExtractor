@@ -21,6 +21,8 @@ namespace MCFGSextractor
             {
                 var pattern = new byte[] { 0x00, 0x00, 0x02, 0x19, 0x00, 0x00, 0x01 };
                 var pattern2 = new byte[] { 0x00, 0x00, 0x02, 0x09, 0x00, 0x00, 0x01 };
+                // pattern3 has 32bits length
+                var pattern3 = new byte[] { 0x02, 0x00, 0x10, 0x19, 0x00, 0x00, 0x01 };
 
                 Queue<byte> queue = new Queue<byte>(pattern.Length);
 
@@ -33,7 +35,18 @@ namespace MCFGSextractor
                     }
 
                     queue.Enqueue(buffer[0]);
+                    var length_size = 0;
                     if (Matches(queue, pattern) || Matches(queue, pattern2))
+                    {
+                        length_size = 16;
+                    }
+                    else if (Matches(queue, pattern3))
+                    {
+                        length_size = 32;
+                    }
+
+
+                    if (length_size > 0)
                     {
                         // The input is positioned after the last read byte, which
                         // completed the pattern.
@@ -52,11 +65,21 @@ namespace MCFGSextractor
                         reader.ReadByte();
                         reader.ReadByte();
                         reader.ReadByte();
-                        var length = reader.ReadUInt16();
+
+                        var length = 0L;
+                        if (length_size == 32)
+                        {
+                            length = reader.ReadUInt32();
+                        }
+                        else
+                        {
+                            length = reader.ReadUInt16();
+                        }
+
                         if (length < 1)
                             continue;
                         reader.ReadByte();
-                        var contents = reader.ReadBytes(length - 1);
+                        var contents = reader.ReadBytes((int)(length - 1));
                         //var contents = reader.ReadString();
                         //Console.WriteLine(length);
                         var dirname = Path.GetDirectoryName(OutDir + filename);
